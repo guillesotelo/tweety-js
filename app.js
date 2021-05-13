@@ -1,30 +1,31 @@
 const express = require( 'express' );
-const morgan = require("morgan");
-const app = express(); 
-const port = 3000
+const morgan = require('morgan'); //middleware application logger
+const nunjucks = require( 'nunjucks' );
 
-app.use("/", (req, res, next) => {
-    console.log("Dentro del primer Middleware")
-    next()
-})  
+const app = express(); // crea una instancia de una aplicación de express
 
-app.use('/special', (req, res, next) => {
-    console.log("Llegaste a un área especial.")
-    next()
-})  
-
-app.get("/", (req, res, next) => {
-    res.send("WEB:\nHolis")
-    next()
-})  
-
-app.get("/special", (req, res, next) => {
-    res.send("WEB:\nLlegaste a un área especial.")
-    next()
-})  
+// Configurando Nunjucks
+app.set('view engine', 'html'); // hace que res.render funcione con archivos html
+app.engine('html', nunjucks.render); // cuando le den archivos html a res.render, va a usar nunjucks
+nunjucks.configure('views'); // apunta a nunjucks al directorio correcto para los templates
 
 app.use(morgan('tiny'))
 
-app.listen(port, function(){
-    console.log(`Servidor corriendo en el puerto ${port}`)
+let tweetsDeEjemplo = [
+    { id: 1, name: "juan", content: "este es un tweeettt de juan" },
+    { id: 2, name: "carlos", content: "este es un tweeettt de carlos" },
+    { id: 3, name: "pepe", content: "este es un tweeettt de pepe" },
+];
+
+app.get('/', function (req, res) {
+    res.render( 'index', { tweets: tweetsDeEjemplo });
 });
+
+app.use(express.static('./public'))
+
+app.listen(3000, function(){
+    console.log('Estas escuhando en http://localhost:3000')
+});
+
+
+
